@@ -59,6 +59,7 @@ import org.apache.arrow.vector.holders.NullableDateMilliHolder;
 import org.apache.arrow.vector.holders.NullableFloat8Holder;
 import org.apache.arrow.vector.types.Types;
 import org.apache.arrow.vector.types.pojo.Field;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,25 +151,29 @@ public class TimestreamRecordHandler
                 case FLOAT8:
                     builder.withExtractor(nextField.getName(), (Float8Extractor) (Object context, NullableFloat8Holder value) -> {
                         value.isSet = 1;
-                        value.value = Double.valueOf(((Row) context).getData().get(curFieldNum).getScalarValue());
+                        String rawValue = ((Row) context).getData().get(curFieldNum).getScalarValue();
+                        value.value = rawValue != null ? Double.parseDouble(rawValue) : 0;
                     });
                     break;
                 case BIT:
                     builder.withExtractor(nextField.getName(), (BitExtractor) (Object context, NullableBitHolder value) -> {
                         value.isSet = 1;
-                        value.value = Boolean.valueOf(((Row) context).getData().get(curFieldNum).getScalarValue()) == false ? 0 : 1;
+                        String rawValue = ((Row) context).getData().get(curFieldNum).getScalarValue();
+                        value.value = BooleanUtils.toBoolean(rawValue) ? 1 : 0;
                     });
                     break;
                 case BIGINT:
                     builder.withExtractor(nextField.getName(), (BigIntExtractor) (Object context, NullableBigIntHolder value) -> {
                         value.isSet = 1;
-                        value.value = Long.valueOf(((Row) context).getData().get(curFieldNum).getScalarValue());
+                        String rawValue = ((Row) context).getData().get(curFieldNum).getScalarValue();
+                        value.value = rawValue != null ? Long.parseLong(rawValue) : 0;
                     });
                     break;
                 case DATEMILLI:
                     builder.withExtractor(nextField.getName(), (DateMilliExtractor) (Object context, NullableDateMilliHolder value) -> {
                         value.isSet = 1;
-                        value.value = TIMESTAMP_FORMATTER.parse(((Row) context).getData().get(curFieldNum).getScalarValue()).getTime();
+                        String rawValue = ((Row) context).getData().get(curFieldNum).getScalarValue();
+                        value.value = rawValue != null ? TIMESTAMP_FORMATTER.parse(rawValue).getTime() : 0;
                     });
                     break;
                 case LIST:

@@ -75,7 +75,7 @@
              throws Exception
      {
          extractor.extract(context, holder);
-         if (holder.isSet > 0) {
+         if (holder.isSet > 0 && holder.value != null) {
              vector.setSafe(rowNum, holder.value.getBytes(Charsets.UTF_8));
          }
          else {
